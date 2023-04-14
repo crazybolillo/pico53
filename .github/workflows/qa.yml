@@ -26,3 +26,17 @@ jobs:
           pip install pre-commit
       - name: Run pre-commit
         run: pre-commit run --all-files
+  unittests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install tools
+        run: sudo apt install cmake
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Build tests
+        run: |
+          cmake -D HOST_BUILD=YES -B cmake-build-host
+          make -C cmake-build-host
+      - name: Run tests
+        run: make -C cmake-build-host ARGS="-V" test
