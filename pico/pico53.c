@@ -3,20 +3,14 @@
 
 #include "hardware/i2c.h"
 #include "pico/stdlib.h"
+#include "picoi2c.h"
+#include "si5351.h"
 
 int stdin_char;
 uint8_t i2c_buffer;
 int buffer_counter = 0;
 char stdin_buffer[256] = {0};
-
-uint8_t i2c_data_1[] = {0x03, 0x00};
-uint8_t i2c_data_2[] = {0x1A, 0x01, 0xF4, 0x00, 0x0A, 0x3D, 0x00, 0x01, 0x5C};
-uint8_t i2c_data_3[] = {
-    0x2A, 0x00, 0x01, 0x0C, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
-uint8_t i2c_data_4[] = {0x10, 0x4C};
-uint8_t i2c_data_5[] = {0x95, 0x00};
-uint8_t i2c_data_6[] = {0xA2, 0x00, 0x000, 0x00};
+struct Si5351Config config = {0};
 
 void read_from_buffer() {
     memset(stdin_buffer, 0, sizeof(stdin_buffer));
@@ -45,27 +39,13 @@ void setup_i2c(void) {
     gpio_pull_up(16);
 }
 
-void set_si5351a(void) {
-    printf("Setting up Si5351A on 0x60\n");
-    if (i2c_read_blocking(i2c_default, 0x60, &i2c_buffer, 1, false) == PICO_ERROR_GENERIC) {
-        printf("Error connecting\n");
-        return;
-    }
-
-    i2c_write_blocking(i2c_default, 0x60, i2c_data_2, sizeof(i2c_data_2), false);
-    i2c_write_blocking(i2c_default, 0x60, i2c_data_3, sizeof(i2c_data_3), false);
-    i2c_write_blocking(i2c_default, 0x60, i2c_data_1, sizeof(i2c_data_1), false);
-    i2c_write_blocking(i2c_default, 0x60, i2c_data_4, sizeof(i2c_data_4), false);
-    i2c_write_blocking(i2c_default, 0x60, i2c_data_5, sizeof(i2c_data_5), false);
-    i2c_write_blocking(i2c_default, 0x60, i2c_data_6, sizeof(i2c_data_6), false);
-}
-
 int main() {
     stdio_init_all();
     gpio_init(PICO_DEFAULT_LED_PIN);
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
 
     setup_i2c();
+    config.ref_freq = REF_25;
 
     while (!stdio_usb_connected()) continue;
     read_from_buffer();
@@ -73,7 +53,24 @@ int main() {
 
     while (true) {
         read_from_buffer();
-        if (strcmp(stdin_buffer, "i2c") == 0) { set_si5351a(); }
+        if (strcmp(stdin_buffer, "i2c") == 0) {
+            if (i2c_read_blocking(i2c_default, 0x60, &i2c_buffer, 1, false) == PICO_ERROR_GENERIC) {
+                printf("Error connecting\n");
+            } else {
+                printf("I2C device found on 0x60\n");
+            }
+        }
+        if (strncmp(stdin_buffer, "freq", 4) == 0) {
+            si5351_init(0x60, i2c_default);
+            if (si5351_gen_conf(&config, 151e6) == 0) {
+                si5351_set_freq(&config, MS0);
+                si5351_set_out(MS0, 1);
+            } else {
+                printf("Could not generate a valid configuration. No frequency will be set\n");
+            }
+            printf("FMD = %lu + (%lu / %lu)\n", config.fmd_int, config.fmd_num, config.fmd_den);
+            printf("OMD = %lu + (%lu / %lu)\n", config.omd_int, config.omd_num, config.omd_den);
+        }
         printf("\n\n");
     }
 }
