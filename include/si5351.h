@@ -6,6 +6,11 @@
 
 #define SI5351_FREQ_TOL 2
 
+extern const uint8_t Si5351_OUT_EN_CTRL;
+extern const uint8_t Si5351_CLK0_CTRL;
+extern const uint8_t Si5351_CLK1_CTRL;
+extern const uint8_t Si5351_CLK2_CTRL;
+
 extern const uint32_t Si5351_MIN_VCO_FREQ;
 extern const uint32_t Si5351_MAX_VCO_FREQ;
 
@@ -17,7 +22,7 @@ extern const uint16_t Si5351_MAX_OMD_INT;
 extern const uint32_t Si5351_MAX_DIVIDER_DENOMINATOR;
 
 enum RefFrequency { REF_25 = 25000000, REF_27 = 27000000 };
-enum Multisynth { MS0, MS1, MS2 };
+enum Multisynth { MS0 = 0, MS1 = 1, MS2 = 2 };
 enum PLL { PLL_A, PLL_B };
 
 struct Si5351Config {
