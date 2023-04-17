@@ -45,4 +45,8 @@ TEST_F(TestSi5351, GenConf) {
     target_freq = 10.7e6;
     ASSERT_EQ(0, si5351_gen_conf(&config, target_freq));
     ASSERT_NEAR(si5351_comp_freq(&config), target_freq, SI5351_FREQ_TOL);
+
+    target_freq = 130e6;
+    ASSERT_EQ(0, si5351_gen_conf(&config, target_freq));
+    ASSERT_NEAR(si5351_comp_freq(&config), target_freq, 5);
 }
