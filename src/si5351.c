@@ -13,6 +13,7 @@ const uint32_t Si5351_MAX_DIVIDER_DENOMINATOR = 1048575;
 static uint8_t valid_omd_int(uint32_t omd) {
     switch (omd) {
         case 4:
+        case 6:
         case 8:
             return 1;
         default:
