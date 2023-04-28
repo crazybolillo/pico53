@@ -1,5 +1,10 @@
 #include "si5351.h"
 
+const uint8_t Si5351_OUT_EN_CTRL = 0x03;
+const uint8_t Si5351_CLK0_CTRL = 0x10;
+const uint8_t Si5351_CLK1_CTRL = 0x11;
+const uint8_t Si5351_CLK2_CTRL = 0x12;
+
 const uint32_t Si5351_MIN_VCO_FREQ = 600000000;
 const uint32_t Si5351_MAX_VCO_FREQ = 900000000;
 

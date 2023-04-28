@@ -29,10 +29,33 @@ void si5351_init(uint8_t si5351_addr, struct i2c_inst *i2c_interface);
 void si5351_set_freq(struct Si5351Config *config, enum Multisynth ms);
 
 /**
- *
- * @param ms
- * @param status
+ * Turn on or off the output associated with the specified Multisynth
+ * @param ms The clock associated with this Multisynth will be modified
+ * @param status 0: OFF - otherwise ON
  */
 void si5351_set_out(enum Multisynth ms, uint8_t status);
+
+/**
+ * Enable or disable the clock associated with the specified Multisynth
+ * @param ms The clock associated with this Multisynth will be modified
+ * @param status 0: disabled - otherwise enabled
+ * @param invert Whether to invert (1) or not (0) the clock's output
+ */
+void si5351_en_clk(enum Multisynth ms, uint8_t status, uint8_t invert);
+
+/**
+ * Write to a specified register
+ * @param reg Register to be written
+ * @param value Value to be written into the register
+ * @return The result of the write operation, as returned by Pico's SDK
+ */
+int si5351_write(uint8_t reg, uint8_t value);
+
+/**
+ * Read data from a specified register
+ * @param reg Register to read the data from
+ * @return The result of the read operation, as returned by Pico's SDK
+ */
+int si5351_read(uint8_t reg);
 
 #endif  // PICO53_PICOI2C_H
